@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css"> <!-- Link to your CSS file -->
+    <title>Bitcoin (BTC)</title>
+  </head>
+
+  <body>
+
+
+    <div class="crypto-item">
+
+      <span class="coin-name">${coinName}</span>
+
+      <span class="price" id='ids-price'>-</span>
+      <span class="change" id='ids-change'>-</span>
+
+      <a class="chart-button" href="https://www.tradingview.com/chart/lgciIAhL/?symbol=BITGET%3AADAUSDT" target="_blank">Chart</a>
+    </div>
+
+<!------------------------------------------------------------------------------------------------------>
+
+
+    <script>
+      const ids = 'cardano' // from coingeck list.json
+      const name = 'Cardano' // For display, 1st letter capital
+      const symbol = 'ADA' // symbol, e.g  BTC
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+      const coinName = `${name} (${symbol})`;
+
+      const cryptoItem = document.querySelector('.crypto-item');
+      cryptoItem.innerHTML = cryptoItem.innerHTML.replaceAll('ids', ids);
+
+      const coinNameElement = document.querySelector('.coin-name');
+      coinNameElement.innerHTML = coinName;
+
+
+
+      const fetchCoinData = () => {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const price = data[ids].usd;
+        const change = data[ids].usd_24h_change.toFixed(2);
+
+        document.getElementById(`${ids}-price`).textContent = `$${price}`;
+        document.getElementById(`${ids}-change`).textContent = `${change}%`;
+
+        if (data[ids].usd_24h_change > 0) {
+          document.getElementById(`${ids}-change`).style.color = 'green';
+        } else if (data[ids].usd_24h_change < 0) {
+          document.getElementById(`${ids}-change`).style.color = 'red';
+        } else {
+          document.getElementById(`${ids}-change`).style.color = 'white';
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        // Retry fetch after 60 seconds
+        setTimeout(fetchCoinData, 60000); // 60000 milliseconds = 60 seconds
+      });
+  };
+
+  // Initial fetch
+  fetchCoinData();
+    </script>
+  </body>
+</html>
